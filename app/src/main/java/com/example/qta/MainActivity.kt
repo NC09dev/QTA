@@ -1,75 +1,58 @@
 package com.example.qta
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var inputValue: EditText
+    private lateinit var btnCelsius: Button
+    private lateinit var btnFahrenheit: Button
+    private lateinit var btnKelvin: Button
+    private lateinit var outputCelsius: TextView
+    private lateinit var outputFahrenheit: TextView
+    private lateinit var outputKelvin: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main)  // Asegúrate de que el XML está creado
 
-        // Referencias a los elementos del layout
-        val etNumber1 = findViewById<EditText>(R.id.etNumber1)
-        val etNumber2 = findViewById<EditText>(R.id.etNumber2)
-        val tvResult = findViewById<TextView>(R.id.tvResult)
+        // Referencias a los elementos de la UI
+        inputValue = findViewById(R.id.inputValue)
+        btnCelsius = findViewById(R.id.btnCelsius)
+        btnFahrenheit = findViewById(R.id.btnFahrenheit)
+        btnKelvin = findViewById(R.id.btnKelvin)
 
-        val btnSumar = findViewById<Button>(R.id.btnSumar)
-        val btnRestar = findViewById<Button>(R.id.btnRestar)
-        val btnMultiplicar = findViewById<Button>(R.id.btnMultiplicar)
-        val btnDividir = findViewById<Button>(R.id.btnDividir)
-
-        // Función para obtener números ingresados y validar
-        fun getNumbers(): Pair<Double, Double>? {
-            val num1Text = etNumber1.text.toString()
-            val num2Text = etNumber2.text.toString()
-
-            if (num1Text.isEmpty() || num2Text.isEmpty()) {
-                Toast.makeText(this, "Ingrese ambos números", Toast.LENGTH_SHORT).show()
-                return null
-            }
-
-            return Pair(num1Text.toDouble(), num2Text.toDouble())
-        }
-
-        // Evento click para cada botón
-        btnSumar.setOnClickListener {
-            val numbers = getNumbers()
-            numbers?.let {
-                val result = it.first + it.second
-                tvResult.text = "Resultado: $result"
-            }
-        }
-
-        btnRestar.setOnClickListener {
-            val numbers = getNumbers()
-            numbers?.let {
-                val result = it.first - it.second
-                tvResult.text = "Resultado: $result"
-            }
-        }
-
-        btnMultiplicar.setOnClickListener {
-            val numbers = getNumbers()
-            numbers?.let {
-                val result = it.first * it.second
-                tvResult.text = "Resultado: $result"
-            }
-        }
-
-        btnDividir.setOnClickListener {
-            val numbers = getNumbers()
-            numbers?.let {
-                if (it.second == 0.0) {
-                    Toast.makeText(this, "No se puede dividir entre 0", Toast.LENGTH_SHORT).show()
-                } else {
-                    val result = it.first / it.second
-                    tvResult.text = "Resultado: $result"
-                }
-            }
-        }
+        // Asignar eventos a los botones
+        btnCelsius.setOnClickListener { convertTemperature("Celsius") }
+        btnFahrenheit.setOnClickListener { convertTemperature("Fahrenheit") }
+        btnKelvin.setOnClickListener { convertTemperature("Kelvin") }
     }
+
+    private fun convertTemperature(unit: String) {
+        val value = inputValue.text.toString().toDoubleOrNull()
+
+        if (value == null) {
+            Toast.makeText(this, "Ingrese un valor válido", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val celsius: Double = when (unit) {
+            "Celsius" -> value
+            "Fahrenheit" -> (value - 32) * 5 / 9
+            "Kelvin" -> value - 273.15
+            else -> value
+        }
+
+        // Convertimos a todas las unidades
+        val fahrenheit = (celsius * 9 / 5) + 32
+        val kelvin = celsius + 273.15
+
+        // Mostramos los resultados en la UI con 3 decimales
+        findViewById<TextView>(R.id.resultCelsius)?.text = "%.3f".format(celsius)
+        findViewById<TextView>(R.id.resultFahrenheit)?.text = "%.3f".format(fahrenheit)
+        findViewById<TextView>(R.id.resultKelvin)?.text = "%.3f".format(kelvin)
+    }
+
 }
